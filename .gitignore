@@ -1,1 +1,14 @@
+# 🔹 Virtual Environment
 venv/
+env/
+ENV/
+
+# 🔹 Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 🔹 Environment variables (IMPORTANT ⚠️)
+.env
+
