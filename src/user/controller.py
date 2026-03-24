@@ -64,4 +64,4 @@ def is_authenticated(request:Request, db:Session):
     print(data)
     return "done"
 
-print("hi")
+print("hi hello yes")
