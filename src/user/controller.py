@@ -6,6 +6,7 @@ from pwdlib import PasswordHash
 from src.utils.settings import settings
 from datetime import datetime, timedelta
 import jwt
+from jwt.exceptions import InvalidTokenError
 
 password_hash = PasswordHash.recommended()
 
@@ -50,7 +51,7 @@ def login_user(body: LoginSchema, db:Session):
     if not verify_password(body.password, user.hash_password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid password..")
 
-    exp_time = datetime.now() + timedelta(minutes=settings.EXP_TIME)
+    exp_time = (datetime.now() + timedelta(minutes=settings.EXP_TIME)).timestamp()
 
     token = jwt.encode({"_id":user.id, "exp":exp_time}, settings.SECRET_KEY, settings.ALGORITHM)
 
@@ -58,10 +59,16 @@ def login_user(body: LoginSchema, db:Session):
 
 
 def is_authenticated(request:Request, db:Session):
-    token = request.headers.get("authorization")
-    token = token.split(" ")[-1]
-    data = jwt.decode(token, settings.SECRET_KEY, settings.ALGORITHM)
-    print(data)
-    return "done"
-
-print("hi hello")
+    try:
+        token = request.headers.get("authorization")
+        if not token:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="You are Unauthorized..")
+        token = token.split(" ")[-1]
+        data = jwt.decode(token, settings.SECRET_KEY, settings.ALGORITHM)
+        user_id = data.get("_id")
+        user  = db.query(UserModel).filter(UserModel.id == user_id).first()
+        if not user:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="You are Unauthorized..")
+        return user
+    except InvalidTokenError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="You are Unauthorized..")
