@@ -21,8 +21,8 @@ def get_tasks(db:Session, user:UserModel):
     tasks = db.query(TaskModel).filter(TaskModel.user_id == user.id).all()
     return tasks
 
-def get_by_id(id: int,db: Session):
-    one_task = db.query(TaskModel).get(id)
+def get_by_id(id: int,db: Session, user:UserModel):
+    one_task = db.query(TaskModel).filter(TaskModel.user_id == user.id).first()
     if not one_task:
         raise HTTPException(404, detail="Id is incorrect")
     return one_task

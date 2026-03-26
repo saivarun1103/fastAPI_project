@@ -19,7 +19,7 @@ def get_tasks(db:Session = Depends(get_db), user:UserModel = Depends(is_authenti
 
 @task_routes.get("/get_one_task/{id}", response_model = TaskResponseSchema, status_code = status.HTTP_200_OK)
 def get_by_id(id: int, db:Session = Depends(get_db), user:UserModel = Depends(is_authenticated)):
-    return controller.get_by_id(id, db)
+    return controller.get_by_id(id, db, user)
 
 @task_routes.put("/update_task/{id}",response_model = TaskResponseSchema, status_code = status.HTTP_201_CREATED)
 def update_task(body : TaskSchema, id : int, db:Session = Depends(get_db), user:UserModel = Depends(is_authenticated)):
